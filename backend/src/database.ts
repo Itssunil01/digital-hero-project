@@ -1,8 +1,10 @@
-import sqlite3 from 'sqlite3';
 import path from 'path';
+import Database from "better-sqlite3";
+
+const db = new Database("database.db");
 
 const dbPath = process.env.DATABASE_PATH || './database.db';
-const db = new sqlite3.Database(path.resolve(dbPath));
+// const db = new sqlite3.Database(path.resolve(dbPath));
 
 // Create tables
 db.serialize(() => {
