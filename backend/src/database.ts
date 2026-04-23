@@ -1,9 +1,21 @@
+// src/database.ts
 
-const db = {
+// ✅ Force TypeScript to ignore strict typing
+const db: any = {
   serialize: (fn: Function) => fn(),
 
   run: (...args: any[]) => {
-    console.log("DB.run called:", args);
+    console.log("DB.run:", args);
+  },
+
+  get: (...args: any[]) => {
+    console.log("DB.get:", args);
+    return null;
+  },
+
+  all: (...args: any[]) => {
+    console.log("DB.all:", args);
+    return [];
   },
 
   prepare: (query: string) => {
@@ -13,15 +25,13 @@ const db = {
       run: (...args: any[]) => {
         console.log("DB.prepare.run:", args);
       },
-
       get: (...args: any[]) => {
         console.log("DB.prepare.get:", args);
-        return null; // simulate no data
+        return null;
       },
-
       all: (...args: any[]) => {
         console.log("DB.prepare.all:", args);
-        return []; // simulate empty list
+        return [];
       },
     };
   },
