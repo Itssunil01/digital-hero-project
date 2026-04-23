@@ -1,35 +1,30 @@
-import path from 'path';
-import Database from "better-sqlite3";
 
-const db = new Database("database.db");
+const db = {
+  serialize: (fn: Function) => fn(),
 
-const dbPath = process.env.DATABASE_PATH || './database.db';
-// const db = new sqlite3.Database(path.resolve(dbPath));
+  run: (...args: any[]) => {
+    console.log("DB.run called:", args);
+  },
 
-// Create tables
-db.serialize(() => {
-  db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      name TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+  prepare: (query: string) => {
+    console.log("DB.prepare:", query);
 
-  db.run(`
-    CREATE TABLE IF NOT EXISTS charities (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      description TEXT,
-      goal REAL,
-      raised REAL DEFAULT 0,
-      user_id INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-  `);
-});
+    return {
+      run: (...args: any[]) => {
+        console.log("DB.prepare.run:", args);
+      },
+
+      get: (...args: any[]) => {
+        console.log("DB.prepare.get:", args);
+        return null; // simulate no data
+      },
+
+      all: (...args: any[]) => {
+        console.log("DB.prepare.all:", args);
+        return []; // simulate empty list
+      },
+    };
+  },
+};
 
 export default db;
