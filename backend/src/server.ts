@@ -5,6 +5,9 @@ import charityRoutes from './routes/charities';
 import paymentRoutes from "./routes/paymentRoutes";
 import dotenv from 'dotenv';
 import path from "path";
+import userRoutes from "./routes/user";
+
+
 
 dotenv.config({
   path: path.join(process.cwd(), ".env"),
@@ -24,6 +27,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use('/api/charities', charityRoutes);
+app.use("/api/user", userRoutes);
 
 // ✅ FIXED HERE
 app.use("/api/payment", paymentRoutes);
