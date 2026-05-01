@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import db from '../database';
+import { signup, login } from "../controller/authController";
 
 const router = express.Router();
 
@@ -25,64 +26,8 @@ const dbRun = (query: string, params: any[] = []): Promise<{ lastID: number; cha
   });
 };
 
-// Signup
-router.post('/signup', async (req, res) => {
-  const { email, password, name } = req.body;
+router.post("/signup", signup);
+router.post("/login", login);
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
-  }
-
-  try {
-    // Check if user exists
-    const existingUser = await dbGet('SELECT id FROM users WHERE email = ?', [email]);
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Insert user
-    const result = await dbRun('INSERT INTO users (email, password, name) VALUES (?, ?, ?)', [email, hashedPassword, name]);
-
-    // Generate token
-    const token = jwt.sign({ id: result.lastID, email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-
-    res.status(201).json({ message: 'User created successfully', token });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Login
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
-  }
-
-  try {
-    // Find user
-    const user = await dbGet('SELECT * FROM users WHERE email = ?', [email]);
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    // Generate token
-    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-
-    res.json({ message: 'Login successful', token });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
 
 export default router;
